@@ -132,7 +132,7 @@ export function StudentLoginForm({
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
                 <img
-                  src="/logo-lf.png"
+                  src="/images/NSC Letterhead.png"
                   alt="Northern Samar Colleges logo"
                   className="mb-2 h-20 w-auto object-contain"
                 />
@@ -149,7 +149,7 @@ export function StudentLoginForm({
               {loginError && (
                 <div
                   role="alert"
-                  className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive"
+                  className="rounded-lg border border-red-600/30 bg-red-600/10 px-4 py-3 text-sm font-medium text-red-600"
                 >
                   {loginError}
                 </div>
@@ -174,12 +174,18 @@ export function StudentLoginForm({
                   placeholder="250045"
                   autoComplete="username"
                   aria-invalid={Boolean(errors.studentNumber)}
+                  className="
+                  aria-invalid:border-red-600
+                  aria-invalid:ring-red-600/20
+                  dark:aria-invalid:border-red-500
+                  dark:aria-invalid:ring-red-500/30
+                "
                 />
 
                 {errors.studentNumber && (
                   <p
                     role="alert"
-                    className="text-xs font-medium text-destructive"
+                    className="text-xs font-medium text-red-600"
                   >
                     {errors.studentNumber}
                   </p>
@@ -211,12 +217,18 @@ export function StudentLoginForm({
                   placeholder="Enter your password"
                   autoComplete="current-password"
                   aria-invalid={Boolean(errors.password)}
+                  className="
+                  aria-invalid:border-red-600
+                  aria-invalid:ring-red-600/20
+                  dark:aria-invalid:border-red-500
+                  dark:aria-invalid:ring-red-500/30
+                "
                 />
 
                 {errors.password && (
                   <p
                     role="alert"
-                    className="text-xs font-medium text-destructive"
+                    className="text-xs font-medium text-red-600"
                   >
                     {errors.password}
                   </p>

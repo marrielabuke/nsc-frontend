@@ -48,7 +48,7 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* hex values are custom  */
+
 :root {
   /* =========================
      BASE
@@ -202,6 +202,24 @@
   --sidebar-accent-foreground: oklch(0.97 0 0);
   
   --sidebar-border: oklch(1 0 0 / 10%);
+
+
+  /* =========================
+     Department / COURSE COLORS
+  ========================= */
+  --education-primary: oklch(0.7 0.2 255);
+  --basic-education-department: oklch(87.175% 0.18433 108.681);
+  --finance-department: oklch(70.268% 0.2293 142.661);
+  --registrars-office: oklch(82.936% 0.13157 190.084);
+
+  --information-technology: oklch(52.709% 0.2076 28.345);
+  --office-administration: oklch(79.295% 0.16262 104.836);
+  --hotel-management: oklch(49.009% 0.2099 318.445);
+
+
+
+
+
 }
 
 @layer base {
