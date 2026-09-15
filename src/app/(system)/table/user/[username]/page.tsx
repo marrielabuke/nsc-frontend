@@ -6,7 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { BadgeCheck } from "lucide-react";
 import EditUserPage from "@/components/user/editUser";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import AppLineChart from "@/components/AppLineChart";
+import AppLineChart from "@/components/charts/AppLineChart";
 
 
 const SingleUserpage = () => {
@@ -169,6 +169,7 @@ const SingleUserpage = () => {
                 </div>
                 </div>
             </div>
+        </div>
         </div>
     );
     

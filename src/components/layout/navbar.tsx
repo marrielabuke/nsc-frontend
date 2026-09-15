@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { SidebarTrigger } from "@/components/ui/sidebar"
+import { logout } from "@/lib/auth/api"
 import { clearActiveSession } from "@/lib/auth/session"
 
 const Navbar = () => {
@@ -24,7 +25,8 @@ const Navbar = () => {
   const router = useRouter()
   const pathname = usePathname()
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await logout().catch(() => undefined)
     clearActiveSession()
     router.push(pathname.startsWith("/student") ? "/login" : "/staff/login")
   }

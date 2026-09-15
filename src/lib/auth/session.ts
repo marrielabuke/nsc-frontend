@@ -1,36 +1,31 @@
-export type SessionType = "student" | "staff"
-
 export interface ActiveSession {
-  type: SessionType
+  accessToken: string
+  id: string
+  email: string
   role: string
-  [key: string]: unknown
+}
+
+const SESSION_KEY = "authSession"
+
+export function setActiveSession(accessToken: string, user: Omit<ActiveSession, "accessToken">) {
+  if (typeof window === "undefined") return
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify({ accessToken, ...user }))
 }
 
 export function getActiveSession(): ActiveSession | null {
   if (typeof window === "undefined") return null
 
-  const staffRaw = sessionStorage.getItem("activeStaff")
-  if (staffRaw) {
-    try {
-      return { ...JSON.parse(staffRaw), type: "staff" }
-    } catch {
-      sessionStorage.removeItem("activeStaff")
-    }
-  }
+  const raw = sessionStorage.getItem(SESSION_KEY)
+  if (!raw) return null
 
-  const studentRaw = sessionStorage.getItem("activeStudent")
-  if (studentRaw) {
-    try {
-      return { ...JSON.parse(studentRaw), type: "student" }
-    } catch {
-      sessionStorage.removeItem("activeStudent")
-    }
+  try {
+    return JSON.parse(raw) as ActiveSession
+  } catch {
+    sessionStorage.removeItem(SESSION_KEY)
+    return null
   }
-
-  return null
 }
 
-export function clearActiveSession(type?: SessionType) {
-  if (!type || type === "staff") sessionStorage.removeItem("activeStaff")
-  if (!type || type === "student") sessionStorage.removeItem("activeStudent")
+export function clearActiveSession() {
+  if (typeof window !== "undefined") sessionStorage.removeItem(SESSION_KEY)
 }

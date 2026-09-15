@@ -305,7 +305,7 @@ export function PresidentDashboard() {
                   {population_by_department.map((entry) => (
                     <Cell
                       key={entry.department}
-                      style={{ fill: entry.fill, fillOpacity: entry.fill_opacity }}
+                      style={{ fill: entry.fill }}
                     />
                   ))}
                   <Label

@@ -1,31 +1,11 @@
-import Link from "next/link";
+import { StudentLoginForm } from "@/components/forms/auth/student-login-form"
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen flex items-center justify-center">
-      <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold">
-          NSC SMS
-        </h1> 
-
-        <p className="text-muted-foreground">
-          Welcome to the Student Management System
-        </p>
-
-        <Link
-          href="/login"
-          className="inline-flex items-center justify-center rounded-md bg-primary px-6 py-2 m-2 text-primary-foreground"
-        >
-          Login
-        </Link>
-
-        <Link
-          href="/programs"
-          className="inline-flex items-center justify-center rounded-md bg-primary px-6 py-2 text-primary-foreground"
-        >
-          Admission
-        </Link>
+    <main className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
+      <div className="w-full max-w-sm md:max-w-4xl">
+        <StudentLoginForm />
       </div>
     </main>
-  );
+  )
 }

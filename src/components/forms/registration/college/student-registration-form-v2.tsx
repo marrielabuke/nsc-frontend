@@ -1,67 +1,35 @@
 "use client"
 
 import { type FormEvent, useState } from "react"
+import Link from "next/link"
 import {
-  ArrowLeft,
-  CheckCircle2,
   Eye,
   EyeOff,
-  LockKeyhole,
   LoaderCircle,
   MailCheck,
   PencilLine,
-  ShieldCheck,
   UserPlus,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field"
+import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-
-type StudentType = "new_student" | "transferee" | "old_student"
-type AdmissionType = "college" | "ptcp"
+import { register } from "@/lib/auth/api"
 
 interface RegistrationData {
-  firstName: string
-  middleName: string
-  lastName: string
-  studentType: StudentType | ""
-  admissionType: AdmissionType | ""
-  contactNumber: string
   email: string
   password: string
-  confirmPassword: string
 }
 
 type RegistrationErrors = Partial<Record<keyof RegistrationData, string>>
 
 const initialData: RegistrationData = {
-  firstName: "",
-  middleName: "",
-  lastName: "",
-  studentType: "",
-  admissionType: "",
-  contactNumber: "",
   email: "",
   password: "",
-  confirmPassword: "",
 }
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-const contactPattern = /^[0-9+()\s-]{7,20}$/
 
 function PasswordInput({
   id,
@@ -126,9 +94,12 @@ export default function UserRegistrationForm() {
   const [formData, setFormData] = useState<RegistrationData>(initialData)
   const [errors, setErrors] = useState<RegistrationErrors>({})
   const [awaitingVerification, setAwaitingVerification] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submissionError, setSubmissionError] = useState<string | null>(null)
 
   const handleChange = (field: keyof RegistrationData, value: string) => {
     setFormData((current) => ({ ...current, [field]: value }))
+    setSubmissionError(null)
 
     if (errors[field]) {
       setErrors((current) => ({ ...current, [field]: undefined }))
@@ -137,28 +108,6 @@ export default function UserRegistrationForm() {
 
   const validateForm = () => {
     const nextErrors: RegistrationErrors = {}
-
-    if (!formData.firstName.trim()) {
-      nextErrors.firstName = "First name is required."
-    }
-
-    if (!formData.lastName.trim()) {
-      nextErrors.lastName = "Last name is required."
-    }
-
-    if (!formData.studentType) {
-      nextErrors.studentType = "Student type is required."
-    }
-
-    if (!formData.admissionType) {
-      nextErrors.admissionType = "Admission type is required."
-    }
-
-    if (!formData.contactNumber.trim()) {
-      nextErrors.contactNumber = "Contact number is required."
-    } else if (!contactPattern.test(formData.contactNumber.trim())) {
-      nextErrors.contactNumber = "Enter a valid contact number."
-    }
 
     if (!formData.email.trim()) {
       nextErrors.email = "Email address is required."
@@ -172,34 +121,39 @@ export default function UserRegistrationForm() {
       nextErrors.password = "Password must contain at least 8 characters."
     }
 
-    if (!formData.confirmPassword) {
-      nextErrors.confirmPassword = "Please confirm your password."
-    } else if (formData.confirmPassword !== formData.password) {
-      nextErrors.confirmPassword = "Passwords do not match."
-    }
-
     setErrors(nextErrors)
     return Object.keys(nextErrors).length === 0
   }
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     if (!validateForm()) return
 
-    // TODO: Submit the account information to your registration API.
-    // The server must hash the password before storing it.
-    // After the API sends its verification email, show the waiting screen.
-    setAwaitingVerification(true)
+    setIsSubmitting(true)
+    setSubmissionError(null)
+
+    try {
+      await register(formData.email.trim(), formData.password, "STUDENT")
+      setAwaitingVerification(true)
+    } catch (error) {
+      setSubmissionError(
+        error instanceof Error
+          ? error.message
+          : "Registration could not be completed. Please try again.",
+      )
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const editEmailAddress = () => {
     setFormData((current) => ({
       ...current,
       password: "",
-      confirmPassword: "",
     }))
     setErrors({})
+    setSubmissionError(null)
     setAwaitingVerification(false)
   }
 
@@ -256,7 +210,7 @@ export default function UserRegistrationForm() {
             </div>
 
             <p className="mt-6 text-sm leading-6 text-muted-foreground">
-              Didn't receive the email? Check your spam or junk folder and
+                  Didn&apos;t receive the email? Check your spam or junk folder and
               confirm that the address above is correct.
             </p>
 
@@ -270,6 +224,10 @@ export default function UserRegistrationForm() {
               <PencilLine className="mr-2 h-4 w-4" />
               Use a different email address
             </Button>
+
+            <Button asChild variant="ghost" size="lg" className="mt-2 w-full">
+              <Link href="/login">Back to login form</Link>
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -282,7 +240,7 @@ export default function UserRegistrationForm() {
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(15,23,42,0.025)_1px,transparent_1px),linear-gradient(90deg,rgba(15,23,42,0.025)_1px,transparent_1px)] bg-[size:48px_48px] dark:bg-[linear-gradient(rgba(255,255,255,0.025)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.025)_1px,transparent_1px)]" />
       <header className="relative z-20 border-b border-slate-200/80 bg-background/85 backdrop-blur-xl dark:border-white/10">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-          <a
+          <Link
             href="/"
             className="flex items-center gap-3 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
@@ -302,7 +260,7 @@ export default function UserRegistrationForm() {
                 Account Registration
               </p>
             </div>
-          </a>
+          </Link>
 
           {/* Make this dynamic */}
           <div className="flex items-center gap-4 sm:gap-6">
@@ -366,184 +324,49 @@ export default function UserRegistrationForm() {
             <CardContent className="px-5 py-6 sm:px-8 lg:px-10 lg:py-8">
               <form onSubmit={handleSubmit} noValidate>
                 <FieldGroup className="gap-6">
-                  <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                    <Field>
-                      <FieldLabel htmlFor="first-name">
-                        First name {requiredMark}
-                      </FieldLabel>
-                      <Input
-                        id="first-name"
-                        name="firstName"
-                        value={formData.firstName}
-                        onChange={(event) =>
-                          handleChange("firstName", event.target.value)
-                        }
-                        placeholder="Juan"
-                        autoComplete="given-name"
-                        aria-invalid={Boolean(errors.firstName)}
-                        className="h-11"
-                      />
-                      <ErrorMessage field="firstName" />
-                    </Field>
-
-                    <Field>
-                      <FieldLabel htmlFor="middle-name">
-                        Middle name
-                        <span className="font-normal text-muted-foreground">
-                          (Optional)
-                        </span>
-                      </FieldLabel>
-                      <Input
-                        id="middle-name"
-                        name="middleName"
-                        value={formData.middleName}
-                        onChange={(event) =>
-                          handleChange("middleName", event.target.value)
-                        }
-                        placeholder="Santos"
-                        autoComplete="additional-name"
-                        className="h-11"
-                      />
-                    </Field>
-
-                    <Field className="sm:col-span-2 lg:col-span-1">
-                      <FieldLabel htmlFor="last-name">
-                        Last name {requiredMark}
-                      </FieldLabel>
-                      <Input
-                        id="last-name"
-                        name="lastName"
-                        value={formData.lastName}
-                        onChange={(event) =>
-                          handleChange("lastName", event.target.value)
-                        }
-                        placeholder="Dela Cruz"
-                        autoComplete="family-name"
-                        aria-invalid={Boolean(errors.lastName)}
-                        className="h-11"
-                      />
-                      <ErrorMessage field="lastName" />
-                    </Field>
-                  </div>
-
-                  <div className="grid gap-5 sm:grid-cols-2">
-                    <Field>
-                      <FieldLabel htmlFor="student-type">
-                        Student type {requiredMark}
-                      </FieldLabel>
-                      <Select
-                        value={formData.studentType}
-                        onValueChange={(value) =>
-                          handleChange("studentType", value as StudentType)
-                        }
-                      >
-                        <SelectTrigger
-                          id="student-type"
-                          className="h-11 w-full"
-                          aria-invalid={Boolean(errors.studentType)}
-                        >
-                          <SelectValue placeholder="Select student type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="new_student">New Student</SelectItem>
-                          <SelectItem value="transferee">Transferee</SelectItem>
-                          <SelectItem value="old_student">Old Student</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <ErrorMessage field="studentType" />
-                    </Field>
-
-                    <Field>
-                      <FieldLabel htmlFor="admission-type">
-                        Admission type {requiredMark}
-                      </FieldLabel>
-                      <Select
-                        value={formData.admissionType}
-                        onValueChange={(value) =>
-                          handleChange("admissionType", value as AdmissionType)
-                        }
-                      >
-                        <SelectTrigger
-                          id="admission-type"
-                          className="h-11 w-full"
-                          aria-invalid={Boolean(errors.admissionType)}
-                        >
-                          <SelectValue placeholder="Select admission type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="college">College</SelectItem>
-                          <SelectItem value="ptcp">PTCP</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <ErrorMessage field="admissionType" />
-                    </Field>
-                  </div>
-
-                  <div className="grid gap-5 sm:grid-cols-2">
-                    <Field>
-                      <FieldLabel htmlFor="contact-number">
-                        Contact number {requiredMark}
-                      </FieldLabel>
-                      <Input
-                        id="contact-number"
-                        name="contactNumber"
-                        type="tel"
-                        inputMode="tel"
-                        value={formData.contactNumber}
-                        onChange={(event) =>
-                          handleChange("contactNumber", event.target.value)
-                        }
-                        placeholder="09XX XXX XXXX"
-                        autoComplete="tel"
-                        aria-invalid={Boolean(errors.contactNumber)}
-                        className="h-11"
-                      />
-                      <ErrorMessage field="contactNumber" />
-                    </Field>
-
-                    <Field>
-                      <FieldLabel htmlFor="email">
-                        Email address {requiredMark}
-                      </FieldLabel>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={(event) =>
-                          handleChange("email", event.target.value)
-                        }
-                        placeholder="juan@example.com"
-                        autoComplete="email"
-                        aria-invalid={Boolean(errors.email)}
-                        className="h-11"
-                      />
-                      <ErrorMessage field="email" />
-                    </Field>
-                  </div>
-
-                  <div className="grid gap-5 sm:grid-cols-2">
-                    <PasswordInput
-                      id="password"
-                      label="Password"
-                      value={formData.password}
-                      placeholder="At least 8 characters"
-                      error={errors.password}
-                      onChange={(value) => handleChange("password", value)}
+                  <Field>
+                    <FieldLabel htmlFor="email">
+                      Email address {requiredMark}
+                    </FieldLabel>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={(event) => handleChange("email", event.target.value)}
+                      placeholder="juan@example.com"
+                      autoComplete="email"
+                      aria-invalid={Boolean(errors.email)}
+                      className="h-11"
                     />
-                    <PasswordInput
-                      id="confirmPassword"
-                      label="Confirm password"
-                      value={formData.confirmPassword}
-                      placeholder="Enter your password again"
-                      error={errors.confirmPassword}
-                      onChange={(value) => handleChange("confirmPassword", value)}
-                    />
-                  </div>
+                    <ErrorMessage field="email" />
+                  </Field>
 
-                  <Button type="submit" size="lg" className="w-full">
-                    <UserPlus className="mr-2 h-4 w-4" />
-                    Create account
+                  <PasswordInput
+                    id="password"
+                    label="Password"
+                    value={formData.password}
+                    placeholder="At least 8 characters"
+                    error={errors.password}
+                    onChange={(value) => handleChange("password", value)}
+                  />
+
+                  {submissionError && (
+                    <p
+                      role="alert"
+                      className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+                    >
+                      {submissionError}
+                    </p>
+                  )}
+
+                  <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
+                    {isSubmitting ? (
+                      <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <UserPlus className="mr-2 h-4 w-4" />
+                    )}
+                    {isSubmitting ? "Creating account..." : "Create account"}
                   </Button>
 
                   <FieldDescription className="text-center">

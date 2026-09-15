@@ -13,19 +13,14 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { login } from "@/lib/auth/api"
+import { setActiveSession } from "@/lib/auth/session"
+import { LoginData, loginSchema } from "@/lib/schemas/auth/login"
 
+type LoginErrors = Partial<Record<keyof LoginData, string>>
 
-import {
-  authenticateStudent,
-  createStudentSession,
-} from "@/lib/auth/student-auth"
-
-import { StudentLoginData, studentLoginSchema } from "@/lib/schemas/student/login"
-
-type LoginErrors = Partial<Record<keyof StudentLoginData, string>>
-
-const initialData: StudentLoginData = {
-  studentNumber: "",
+const initialData: LoginData = {
+  email: "",
   password: "",
 }
 
@@ -35,15 +30,14 @@ export function StudentLoginForm({
 }: React.ComponentProps<"div">) {
   const router = useRouter()
 
-  const [formData, setFormData] =
-    useState<StudentLoginData>(initialData)
+  const [formData, setFormData] = useState<LoginData>(initialData)
 
   const [errors, setErrors] = useState<LoginErrors>({})
   const [loginError, setLoginError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleChange = (
-    field: keyof StudentLoginData,
+    field: keyof LoginData,
     value: string
   ) => {
     setFormData((current) => ({
@@ -63,17 +57,17 @@ export function StudentLoginForm({
     }
   }
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setLoginError("")
 
-    const result = studentLoginSchema.safeParse(formData)
+    const validation = loginSchema.safeParse(formData)
 
-    if (!result.success) {
-      const fieldErrors = result.error.flatten().fieldErrors
+    if (!validation.success) {
+      const fieldErrors = validation.error.flatten().fieldErrors
 
       setErrors({
-        studentNumber: fieldErrors.studentNumber?.[0],
+        email: fieldErrors.email?.[0],
         password: fieldErrors.password?.[0],
       })
 
@@ -83,37 +77,17 @@ export function StudentLoginForm({
     setErrors({})
     setIsSubmitting(true)
 
-    const student = authenticateStudent(
-      result.data.studentNumber,
-      result.data.password
-    )
-
-    if (!student) {
-      setLoginError("Invalid student number or password.")
+    try {
+      const response = await login(validation.data.email, validation.data.password)
+      if (response.user.role.toUpperCase() !== "STUDENT") {
+        throw new Error("This account is not a student account.")
+      }
+      setActiveSession(response.accessToken, response.user)
+      router.push("/student/college")
+    } catch (error) {
+      setLoginError(error instanceof Error ? error.message : "Unable to sign in.")
       setIsSubmitting(false)
-      return
     }
-
-    if (student.status !== "active") {
-      setLoginError("Your student account is currently inactive.")
-      setIsSubmitting(false)
-      return
-    }
-
-   
-    const session = createStudentSession(student)
-
-    sessionStorage.removeItem("activeStaff")
-    sessionStorage.setItem("activeStudent", JSON.stringify(session))
-
-    sessionStorage.setItem(
-      "activeStudent",
-      JSON.stringify(session)
-    )
-
-  
-
-    router.push("/student/college")
   }
 
 
@@ -142,7 +116,7 @@ export function StudentLoginForm({
                 </h1>
 
                 <p className="text-sm text-muted-foreground">
-                  Enter your student number and password.
+                  Enter your registered email address and password.
                 </p>
               </div>
 
@@ -157,23 +131,20 @@ export function StudentLoginForm({
 
               <Field>
                 <FieldLabel htmlFor="student-number">
-                  Student Number
+                  Email address
                 </FieldLabel>
 
                 <Input
-                  id="student-number"
-                  name="studentNumber"
-                  type="text"
-                  value={formData.studentNumber}
+                  id="student-email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
                   onChange={(event) =>
-                    handleChange(
-                      "studentNumber",
-                      event.target.value
-                    )
+                    handleChange("email", event.target.value)
                   }
-                  placeholder="250045"
-                  autoComplete="username"
-                  aria-invalid={Boolean(errors.studentNumber)}
+                  placeholder="student@example.com"
+                  autoComplete="email"
+                  aria-invalid={Boolean(errors.email)}
                   className="
                   aria-invalid:border-red-600
                   aria-invalid:ring-red-600/20
@@ -182,12 +153,12 @@ export function StudentLoginForm({
                 "
                 />
 
-                {errors.studentNumber && (
+                {errors.email && (
                   <p
                     role="alert"
                     className="text-xs font-medium text-red-600"
                   >
-                    {errors.studentNumber}
+                    {errors.email}
                   </p>
                 )}
               </Field>
@@ -248,7 +219,7 @@ export function StudentLoginForm({
               <FieldDescription className="text-center">
                 Don&apos;t have an account?{" "}
                 <a 
-                  href="/registration/college" 
+                  href="/registration"
                   className="font-medium underline underline-offset-4"
                 >
                   Register Student

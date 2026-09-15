@@ -13,30 +13,24 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import {
-  authenticateStaff,
-  createStaffSession,
-} from "@/lib/auth/staff-auth"
-import {
-  type StaffLoginData,
-  staffLoginSchema,
-} from "@/lib/schemas/staff/login"
-import type { StaffRole } from "@/types/staff/staff"
+import { login } from "@/lib/auth/api"
+import { setActiveSession } from "@/lib/auth/session"
+import { type LoginData, loginSchema } from "@/lib/schemas/auth/login"
 
-type LoginErrors = Partial<Record<keyof StaffLoginData, string>>
+type LoginErrors = Partial<Record<keyof LoginData, string>>
 
-const initialData: StaffLoginData = {
-  employeeId: "",
+const initialData: LoginData = {
+  email: "",
   password: "",
 }
 
-const roleRedirects: Partial<Record<StaffRole, string>> = {
-  admin: "/admin",
-  college_registrar: "/registrar/college/",
-  basic_education_registrar: "/registrar/basic-ed",
-  instructor: "/faculty",
-  teacher: "/faculty",
-  president: "/president",
+const roleRedirects: Record<string, string> = {
+  ADMIN: "/admin",
+  COLLEGE_REGISTRAR: "/registrar/college",
+  BASIC_EDUCATION_REGISTRAR: "/registrar/basic-ed",
+  INSTRUCTOR: "/faculty",
+  TEACHER: "/faculty",
+  PRESIDENT: "/president",
 }
 
 export function StaffLoginForm({
@@ -44,13 +38,13 @@ export function StaffLoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const router = useRouter()
-  const [formData, setFormData] = useState<StaffLoginData>(initialData)
+  const [formData, setFormData] = useState<LoginData>(initialData)
   const [errors, setErrors] = useState<LoginErrors>({})
   const [loginError, setLoginError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleChange = (
-    field: keyof StaffLoginData,
+    field: keyof LoginData,
     value: string
   ) => {
     setFormData((current) => ({ ...current, [field]: value }))
@@ -62,16 +56,16 @@ export function StaffLoginForm({
     if (loginError) setLoginError("")
   }
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setLoginError("")
 
-    const result = staffLoginSchema.safeParse(formData)
+    const validation = loginSchema.safeParse(formData)
 
-    if (!result.success) {
-      const fieldErrors = result.error.flatten().fieldErrors
+    if (!validation.success) {
+      const fieldErrors = validation.error.flatten().fieldErrors
       setErrors({
-        employeeId: fieldErrors.employeeId?.[0],
+        email: fieldErrors.email?.[0],
         password: fieldErrors.password?.[0],
       })
       return
@@ -80,39 +74,20 @@ export function StaffLoginForm({
     setErrors({})
     setIsSubmitting(true)
 
-    const staff = authenticateStaff(
-      result.data.employeeId,
-      result.data.password
-    )
+    try {
+      const response = await login(validation.data.email, validation.data.password)
+      const redirectPath = roleRedirects[response.user.role.toUpperCase()]
 
-    if (!staff) {
-      setLoginError("Invalid employee ID or password.")
+      if (!redirectPath) {
+        throw new Error(`No dashboard is configured for the "${response.user.role}" role.`)
+      }
+
+      setActiveSession(response.accessToken, response.user)
+      router.replace(redirectPath)
+    } catch (error) {
+      setLoginError(error instanceof Error ? error.message : "Unable to sign in.")
       setIsSubmitting(false)
-      return
     }
-
-    if (staff.status !== "active") {
-      setLoginError("Your staff account is currently inactive.")
-      setIsSubmitting(false)
-      return
-    }
-
-    const redirectPath = roleRedirects[staff.role]
-
-    if (!redirectPath) {
-      setLoginError(
-        `No dashboard is configured for the "${staff.role}" role.`
-      )
-      setIsSubmitting(false)
-      return
-    }
-
-    const session = createStaffSession(staff)
-
-    sessionStorage.removeItem("activeStudent")
-    sessionStorage.setItem("activeStaff", JSON.stringify(session))
-
-    router.replace(redirectPath)
   }
 
   return (
@@ -145,19 +120,19 @@ export function StaffLoginForm({
               )}
 
               <Field>
-                <FieldLabel htmlFor="employee-id">Employee ID</FieldLabel>
+                  <FieldLabel htmlFor="staff-email">Email address</FieldLabel>
 
                 <Input
-                  id="employee-id"
-                  name="employeeId"
-                  type="text"
-                  value={formData.employeeId}
+                  id="staff-email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
                   onChange={(event) =>
-                    handleChange("employeeId", event.target.value)
+                    handleChange("email", event.target.value)
                   }
-                  placeholder="210001"
-                  autoComplete="username"
-                  aria-invalid={Boolean(errors.employeeId)}
+                  placeholder="staff@example.com"
+                  autoComplete="email"
+                  aria-invalid={Boolean(errors.email)}
                   className="
                   aria-invalid:border-red-600
                   aria-invalid:ring-red-600/20
@@ -166,12 +141,12 @@ export function StaffLoginForm({
                 "
                 />
 
-                {errors.employeeId && (
+                {errors.email && (
                   <p
                     role="alert"
                     className="text-xs font-medium text-red-600"
                   >
-                    {errors.employeeId}
+                    {errors.email}
                   </p>
                 )}
               </Field>

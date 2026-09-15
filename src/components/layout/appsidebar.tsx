@@ -86,7 +86,7 @@ const AppSidebar = ({ role }: AppSidebarProps) => {
                     "
                   >
                     <Link href={item.url}>
-                      <item.icon />
+                      {item.icon ? <item.icon /> : null}
                       <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>

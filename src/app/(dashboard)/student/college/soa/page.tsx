@@ -1,27 +1,15 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
 import DashboardHeader from "@/components/dashboard/dashboard-header"
 
 import PaymentHistoryTable from "@/components/dashboard/payment-history-table"
-import { getActiveSession } from "@/lib/auth/session"
-import { dummyStatementsOfAccount } from "@/lib/dummy/student/soa"
 import type { StatementOfAccount } from "@/types/student/soa"
 import SoaSummaryCard from "@/components/dashboard/soa-summary-card"
 
 const StatementOfAccountPage = () => {
   const [soa, setSoa] = useState<StatementOfAccount | null>(null)
-
-  useEffect(() => {
-    const session = getActiveSession()
-    if (!session) return
-
-    const studentNumber = session.studentNumber as string | undefined
-    if (studentNumber && dummyStatementsOfAccount[studentNumber]) {
-      setSoa(dummyStatementsOfAccount[studentNumber])
-    }
-  }, [])
 
   return (
     <div className="flex min-h-[calc(100vh-136px)] flex-col gap-6">

@@ -926,7 +926,7 @@ export default function CollegeRegistrationForm() {
 
                         {/* Father */}
                         <div className="space-y-4">
-                            <h3 className="text-sm font-semibold uppercase tracking-wide text-primary">Father's Information</h3>
+                            <h3 className="text-sm font-semibold uppercase tracking-wide text-primary">Father&apos;s Information</h3>
                             <div className="grid gap-4 md:grid-cols-2">
                             <Field>
                                 <FieldLabel>Fullname {req}</FieldLabel>
@@ -958,7 +958,7 @@ export default function CollegeRegistrationForm() {
 
                         {/* Mother */}
                         <div className="space-y-4">
-                            <h3 className="text-sm font-semibold uppercase tracking-wide text-primary">Mother's Information</h3>
+                            <h3 className="text-sm font-semibold uppercase tracking-wide text-primary">Mother&apos;s Information</h3>
                             <div className="grid gap-4 md:grid-cols-2">
                             <Field>
                                 <FieldLabel>Fullname {req}</FieldLabel>

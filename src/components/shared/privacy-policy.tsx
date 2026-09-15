@@ -167,7 +167,7 @@ const PrivacyPolicyPage = ({
               <p className="text-sm leading-6 text-primary">
                 By clicking{" "}
                 <span className="font-semibold">
-                  "I Have Read and Agreed"
+                  &quot;I Have Read and Agreed&quot;
                 </span>
                 , you acknowledge that you have read, understood,
                 and consent to this Data Privacy Policy.

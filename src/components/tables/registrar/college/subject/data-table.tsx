@@ -54,7 +54,7 @@ export function DataTable<TData, TValue>({
 
   const [addOpen, setAddOpen] = React.useState(false)
 
-  const tableData q= React.useMemo(() => (Array.isArray(data) ? data : []), [data])
+  const tableData = React.useMemo(() => (Array.isArray(data) ? data : []), [data])
 
   const table = useReactTable({
     data: tableData,

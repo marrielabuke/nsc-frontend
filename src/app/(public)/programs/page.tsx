@@ -58,7 +58,7 @@ import Link from "next/link"
             </div>
   
             <div className="grid gap-6 lg:grid-cols-2">
-            <Link href="/registration/college">
+            <Link href="/registration">
                 <button 
               className="
                 group relative overflow-hidden rounded-3xl border border-white/10
@@ -106,7 +106,7 @@ import Link from "next/link"
             </Link>
 
 
-            <Link href="/registration/college">
+            <Link href="/registration">
               <button
                 className="
                   group relative overflow-hidden rounded-3xl border border-white/10

@@ -6,8 +6,6 @@ import { GraduationCap, CalendarClock } from "lucide-react"
 import DashboardHeader from "@/components/dashboard/dashboard-header"
 import EnrolledSubjectsCard from "@/components/dashboard/enrolled-subjects-card"
 import AssessmentOfFeesCard from "@/components/dashboard/assessment-of-fees-card"
-import { getActiveSession } from "@/lib/auth/session"
-import { dummyRegistrationRecords } from "@/lib/dummy/student/enrollment"
 import type { RegistrationRecord } from "@/types/student/enrollment"
 
 const CollegeStudentDashboard = () => {
@@ -15,17 +13,8 @@ const CollegeStudentDashboard = () => {
   const [studentName, setStudentName] = useState("Student")
 
   useEffect(() => {
-    const session = getActiveSession()
-    if (!session) return
-
-    const studentNumber = session.studentNumber as string | undefined
-    if (studentNumber && dummyRegistrationRecords[studentNumber]) {
-      setRecord(dummyRegistrationRecords[studentNumber])
-    }
-
-    if (session.firstName) {
-      setStudentName(`${session.firstName} ${session.lastName ?? ""}`.trim())
-    }
+    setRecord(null)
+    setStudentName("Student")
   }, [])
 
   return (

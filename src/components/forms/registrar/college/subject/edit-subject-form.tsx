@@ -236,7 +236,7 @@ export function EditSubjectForm({ subject, open, onOpenChange, onSubmit }: EditS
                 Include in Latin Honors
               </Label>
               <p className="text-xs text-muted-foreground">
-                This subject's grade will count toward Latin Honors computation.
+                This subject&apos;s grade will count toward Latin Honors computation.
               </p>
             </div>
           </div>

@@ -1,9 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  
-  images:{
+  turbopack: {
+    root: "C:\\Users\\INFOTECH_USER\\Desktop\\nsc-frontend",
+  },
+  images: {
     remotePatterns: [
       {
         protocol:"https",

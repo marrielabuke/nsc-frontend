@@ -6,7 +6,7 @@ const ForbiddenPage = () => {
       <ShieldAlert className="h-10 w-10 text-destructive" />
       <h1 className="text-2xl font-bold">403 — Access Denied</h1>
       <p className="text-sm text-muted-foreground">
-        You don't have permission to view this page.
+        You don&apos;t have permission to view this page.
       </p>
     </div>
   )
