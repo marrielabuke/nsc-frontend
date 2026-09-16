@@ -2,10 +2,12 @@
 
 import { type FormEvent, useState } from "react"
 import { useRouter } from "next/navigation"
+import { Eye, EyeOff } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import AppAlert from "@/components/shared/AppAlert"
 import {
   Field,
   FieldDescription,
@@ -40,8 +42,10 @@ export function StaffLoginForm({
   const router = useRouter()
   const [formData, setFormData] = useState<LoginData>(initialData)
   const [errors, setErrors] = useState<LoginErrors>({})
+  const [formError, setFormError] = useState("")
   const [loginError, setLoginError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
   const handleChange = (
     field: keyof LoginData,
@@ -53,17 +57,27 @@ export function StaffLoginForm({
       setErrors((current) => ({ ...current, [field]: undefined }))
     }
 
+    if (formError) setFormError("")
+
     if (loginError) setLoginError("")
   }
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    setFormError("")
     setLoginError("")
 
     const validation = loginSchema.safeParse(formData)
 
     if (!validation.success) {
       const fieldErrors = validation.error.flatten().fieldErrors
+
+      if (!formData.email.trim() && !formData.password) {
+        setFormError("Please provide email address and password!")
+        setErrors({})
+        return
+      }
+
       setErrors({
         email: fieldErrors.email?.[0],
         password: fieldErrors.password?.[0],
@@ -111,12 +125,20 @@ export function StaffLoginForm({
               </div>
 
               {loginError && (
-                <div
-                  role="alert"
-                  className="rounded-lg border border-red-600/30 bg-red-600/10 px-4 py-3 text-sm font-medium text-red-600"
-                >
-                  {loginError}
-                </div>
+                <AppAlert
+                  type="error"
+                  title="Login failed"
+                  description={loginError}
+                  onClose={() => setLoginError("")}
+                />
+              )}
+
+              {formError && (
+                <AppAlert
+                  type="warning"
+                  title={formError}
+                  onClose={() => setFormError("")}
+                />
               )}
 
               <Field>
@@ -142,12 +164,14 @@ export function StaffLoginForm({
                 />
 
                 {errors.email && (
-                  <p
-                    role="alert"
-                    className="text-xs font-medium text-red-600"
-                  >
-                    {errors.email}
-                  </p>
+                  <AppAlert
+                    type="warning"
+                    title="Invalid email"
+                    description={errors.email}
+                    onClose={() =>
+                      setErrors((current) => ({ ...current, email: undefined }))
+                    }
+                  />
                 )}
               </Field>
 
@@ -163,32 +187,49 @@ export function StaffLoginForm({
                   </a>
                 </div>
 
-                <Input
-                  id="staff-password"
-                  name="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={(event) =>
-                    handleChange("password", event.target.value)
-                  }
-                  placeholder="Enter your password"
-                  autoComplete="current-password"
-                  aria-invalid={Boolean(errors.password)}
-                  className="
+                <div className="relative">
+                  <Input
+                    id="staff-password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    value={formData.password}
+                    onChange={(event) =>
+                      handleChange("password", event.target.value)
+                    }
+                    placeholder="Enter your password"
+                    autoComplete="current-password"
+                    aria-invalid={Boolean(errors.password)}
+                    className="pr-11
                   aria-invalid:border-red-600
                   aria-invalid:ring-red-600/20
                   dark:aria-invalid:border-red-500
                   dark:aria-invalid:ring-red-500/30
                 "
-                />
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((current) => !current)}
+                    className="absolute right-1 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
 
                 {errors.password && (
-                  <p
-                    role="alert"
-                    className="text-xs font-medium text-red-600"
-                  >
-                    {errors.password}
-                  </p>
+                  <AppAlert
+                    type="warning"
+                    title="Invalid password"
+                    description={errors.password}
+                    onClose={() =>
+                      setErrors((current) => ({ ...current, password: undefined }))
+                    }
+                  />
                 )}
               </Field>
 

@@ -1,5 +1,6 @@
   import {
     Alert,
+      AlertAction,
     AlertDescription,
     AlertTitle,
   } from "@/components/ui/alert"
@@ -8,6 +9,7 @@
     CheckCircle2,
     AlertTriangle,
     XCircle,
+    X,
     Info,
   } from "lucide-react"
   
@@ -24,6 +26,7 @@
     title: string
     description?: string
     className?: string
+    onClose?: () => void
   }
   
   export default function AppAlert({
@@ -31,6 +34,7 @@
     title,
     description,
     className,
+    onClose,
   }: AppAlertProps) {
     const variants = {
       success: {
@@ -76,6 +80,19 @@
           <AlertDescription>
             {description}
           </AlertDescription>
+        )}
+
+        {onClose && (
+          <AlertAction>
+            <button
+              type="button"
+              onClick={onClose}
+              className="inline-flex size-7 items-center justify-center rounded-md text-current/70 transition-colors hover:bg-black/5 hover:text-current focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:hover:bg-white/10"
+              aria-label="Close alert"
+            >
+              <X className="size-4" />
+            </button>
+          </AlertAction>
         )}
       </Alert>
     )

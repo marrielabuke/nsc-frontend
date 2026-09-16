@@ -8,6 +8,8 @@ import EnrolledSubjectsCard from "@/components/dashboard/enrolled-subjects-card"
 import AssessmentOfFeesCard from "@/components/dashboard/assessment-of-fees-card"
 import type { RegistrationRecord } from "@/types/student/enrollment"
 
+
+
 const CollegeStudentDashboard = () => {
   const [record, setRecord] = useState<RegistrationRecord | null>(null)
   const [studentName, setStudentName] = useState("Student")
