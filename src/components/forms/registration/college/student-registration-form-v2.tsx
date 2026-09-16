@@ -296,7 +296,7 @@ export default function UserRegistrationForm() {
 
             <div className="relative">
               <img
-                src="/logo-lf.png"
+                src="/nscletterhead.png"
                 alt="Northern Samar Colleges logo"
                 className="h-20 w-auto object-contain"
               />
@@ -307,7 +307,7 @@ export default function UserRegistrationForm() {
           <div>
           <CardHeader className="border-b px-5 py-6 sm:px-8 lg:px-10 lg:py-8">
             <img
-              src="/logo-lf.png"
+              src="/nscletterhead.png"
               alt="Northern Samar Colleges logo"
               className="mx-auto mb-5 h-16 w-auto object-contain md:hidden"
             />

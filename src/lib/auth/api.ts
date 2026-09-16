@@ -17,7 +17,7 @@ export interface RegisterResponse {
   user: AuthUser
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000"
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001"
 
 async function readError(response: Response): Promise<string> {
   try {
