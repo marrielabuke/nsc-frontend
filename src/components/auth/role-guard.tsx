@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
 
-import { getActiveSession } from "@/lib/auth/session"
+import { restoreActiveSession } from "@/lib/auth/api"
 
 import ForbiddenPage from "../dashboard/forbidden-page"
 
@@ -18,14 +18,22 @@ const RoleGuard = ({ children }: { children: React.ReactNode }) => {
   const [status, setStatus] = useState<Status>("checking")
 
   useEffect(() => {
-    const session = getActiveSession()
+    let cancelled = false
 
-    if (!session) {
-      router.replace(pathname.startsWith("/student") ? "/login" : "/staff/login")
-      return
+    void restoreActiveSession().then((session) => {
+      if (cancelled) return
+
+      if (!session) {
+        router.replace(pathname.startsWith("/student") ? "/login" : "/staff/login")
+        return
+      }
+
+      setStatus(isAllowed(pathname, session.role) ? "ok" : "forbidden")
+    })
+
+    return () => {
+      cancelled = true
     }
-
-    setStatus(isAllowed(pathname, session.role) ? "ok" : "forbidden")
   }, [pathname, router])
 
   if (status === "checking") {

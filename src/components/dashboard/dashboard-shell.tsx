@@ -7,7 +7,7 @@ import Navbar from "@/components/layout/navbar"
 import AppSidebar from "@/components/layout/appsidebar"
 import { SidebarProvider } from "@/components/ui/sidebar"
 import RoleGuard from "@/components/auth/role-guard"
-import { getActiveSession } from "@/lib/auth/session"
+import { restoreActiveSession } from "@/lib/auth/api"
 
 interface DashboardShellProps {
   children: React.ReactNode
@@ -18,7 +18,9 @@ const DashboardShell = ({ children, defaultOpen }: DashboardShellProps) => {
   const [role, setRole] = useState("")
 
   useEffect(() => {
-    setRole(getActiveSession()?.role ?? "")
+    void restoreActiveSession().then((session) => {
+      setRole(session?.role ?? "")
+    })
   }, [])
 
   return (

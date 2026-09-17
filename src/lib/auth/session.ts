@@ -5,27 +5,16 @@ export interface ActiveSession {
   role: string
 }
 
-const SESSION_KEY = "authSession"
+let activeSession: ActiveSession | null = null
 
 export function setActiveSession(accessToken: string, user: Omit<ActiveSession, "accessToken">) {
-  if (typeof window === "undefined") return
-  sessionStorage.setItem(SESSION_KEY, JSON.stringify({ accessToken, ...user }))
+  activeSession = { accessToken, ...user }
 }
 
 export function getActiveSession(): ActiveSession | null {
-  if (typeof window === "undefined") return null
-
-  const raw = sessionStorage.getItem(SESSION_KEY)
-  if (!raw) return null
-
-  try {
-    return JSON.parse(raw) as ActiveSession
-  } catch {
-    sessionStorage.removeItem(SESSION_KEY)
-    return null
-  }
+  return activeSession
 }
 
 export function clearActiveSession() {
-  if (typeof window !== "undefined") sessionStorage.removeItem(SESSION_KEY)
+  activeSession = null
 }
