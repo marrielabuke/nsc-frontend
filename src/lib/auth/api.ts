@@ -40,6 +40,88 @@ function getApiUrl(): string {
 }
 
 let restorePromise: Promise<ActiveSession | null> | null = null
+let refreshPromise: Promise<string | null> | null = null
+let refreshTimer: ReturnType<typeof setTimeout> | null = null
+
+function getAccessTokenExpiry(accessToken: string): number | null {
+  try {
+    const payload = accessToken.split(".")[1]
+    if (!payload) return null
+
+    const decoded = JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/"))) as {
+      exp?: unknown
+    }
+    return typeof decoded.exp === "number" ? decoded.exp * 1_000 : null
+  } catch {
+    return null
+  }
+}
+
+function scheduleTokenRefresh(accessToken: string): void {
+  if (refreshTimer) clearTimeout(refreshTimer)
+
+  const expiresAt = getAccessTokenExpiry(accessToken)
+  if (expiresAt === null) return
+
+  const refreshBuffer = 60_000
+  const refreshDelay = Math.max(0, expiresAt - Date.now() - refreshBuffer)
+
+  refreshTimer = setTimeout(() => {
+    refreshTimer = null
+    void refreshAccessToken()
+  }, refreshDelay)
+}
+
+async function refreshAccessToken(): Promise<string | null> {
+  if (refreshPromise) return refreshPromise
+
+  refreshPromise = (async () => {
+    try {
+      const response = await fetch(`${getApiUrl()}/api/auth/refresh`, {
+        method: "POST",
+        credentials: "include",
+      })
+
+      if (!response.ok) {
+        clearActiveSession()
+        return null
+      }
+
+      const body = (await response.json()) as LoginResponse
+      const current = getActiveSession()
+      setActiveSession(body.accessToken, current ?? body.user)
+      scheduleTokenRefresh(body.accessToken)
+      return body.accessToken
+    } catch {
+      clearActiveSession()
+      return null
+    } finally {
+      refreshPromise = null
+    }
+  })()
+
+  return refreshPromise
+}
+
+export async function authenticatedFetch(
+  input: RequestInfo | URL,
+  init: RequestInit = {},
+  retry = true
+): Promise<Response> {
+  const request = new Request(input, { ...init, credentials: "include" })
+  const accessToken = getActiveSession()?.accessToken
+  if (accessToken) request.headers.set("Authorization", `Bearer ${accessToken}`)
+
+  const response = await fetch(request.clone())
+  if (response.status !== 401 || !retry) return response
+
+  const refreshedAccessToken = await refreshAccessToken()
+  if (!refreshedAccessToken) return response
+
+  const retryRequest = new Request(request, { credentials: "include" })
+  retryRequest.headers.set("Authorization", `Bearer ${refreshedAccessToken}`)
+  return fetch(retryRequest)
+}
 
 async function readError(response: Response): Promise<string> {
   try {
@@ -62,7 +144,10 @@ export async function login(email: string, password: string): Promise<LoginRespo
     throw new Error(await readError(response))
   }
 
-  return (await response.json()) as LoginResponse
+  const body = (await response.json()) as LoginResponse
+  setActiveSession(body.accessToken, body.user)
+  scheduleTokenRefresh(body.accessToken)
+  return body
 }
 
 export async function register(
@@ -95,20 +180,6 @@ export async function verifyEmail(token: string): Promise<void> {
   }
 }
 
-async function fetchCurrentUser(accessToken: string): Promise<AuthUser> {
-  const response = await fetch(`${getApiUrl()}/api/auth/me`, {
-    headers: { Authorization: `Bearer ${accessToken}` },
-    credentials: "include",
-  })
-
-  if (!response.ok) {
-    throw new Error(await readError(response))
-  }
-
-  const body = (await response.json()) as { user: AuthUser }
-  return body.user
-}
-
 export async function restoreActiveSession(): Promise<ActiveSession | null> {
   const current = getActiveSession()
   if (current) return current
@@ -116,19 +187,7 @@ export async function restoreActiveSession(): Promise<ActiveSession | null> {
 
   restorePromise = (async () => {
     try {
-      const response = await fetch(`${getApiUrl()}/api/auth/refresh`, {
-        method: "POST",
-        credentials: "include",
-      })
-
-      if (!response.ok) {
-        clearActiveSession()
-        return null
-      }
-
-      const body = (await response.json()) as LoginResponse
-      const user = await fetchCurrentUser(body.accessToken)
-      setActiveSession(body.accessToken, user)
+      await refreshAccessToken()
       return getActiveSession()
     } catch {
       clearActiveSession()
@@ -142,11 +201,13 @@ export async function restoreActiveSession(): Promise<ActiveSession | null> {
 }
 
 export async function logout(): Promise<void> {
-  const accessToken = getActiveSession()?.accessToken
-
-  await fetch(`${getApiUrl()}/api/auth/logout`, {
-    method: "POST",
-    headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
-    credentials: "include",
-  })
+  try {
+    await authenticatedFetch(`${getApiUrl()}/api/auth/logout`, {
+      method: "POST",
+    })
+  } finally {
+    if (refreshTimer) clearTimeout(refreshTimer)
+    refreshTimer = null
+    clearActiveSession()
+  }
 }
