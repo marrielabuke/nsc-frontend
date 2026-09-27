@@ -5,6 +5,8 @@ import {
   type ActiveSession,
 } from "@/lib/auth/session"
 
+import { dummyStudentUsers } from "@/lib/dummy/student/student"
+
 export interface AuthUser {
   id: string
   email: string
@@ -133,12 +135,27 @@ async function readError(response: Response): Promise<string> {
 }
 
 export async function login(email: string, password: string): Promise<LoginResponse> {
+
+  //Dummy Login
+  const dummyLogin = checkDummyStudent(email, password)
+
+  if (dummyLogin) {
+    setActiveSession(
+      dummyLogin.accessToken,
+      dummyLogin.user
+    )
+
+    return dummyLogin
+  }
+
+
   const response = await fetch(`${getApiUrl()}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
     body: JSON.stringify({ email, password }),
   })
+
 
   if (!response.ok) {
     throw new Error(await readError(response))
@@ -148,6 +165,51 @@ export async function login(email: string, password: string): Promise<LoginRespo
   setActiveSession(body.accessToken, body.user)
   scheduleTokenRefresh(body.accessToken)
   return body
+}
+
+
+//Dummy login logic
+function checkDummyStudent(
+  email: string,
+  password: string
+): LoginResponse | null {
+  if (process.env.NODE_ENV !== "development") {
+    return null
+  }
+
+  const normalizedEmail = email.trim().toLowerCase()
+
+  const student = dummyStudentUsers.find(
+    (student) =>
+      student.email.toLowerCase() === normalizedEmail &&
+      student.password === password
+  )
+
+  if (!student) {
+    return null
+  }
+
+  if (!student.isEmailVerified) {
+    throw new Error(
+      "Your email has not been verified. Please verify your email before logging in."
+    )
+  }
+
+  if (!student.isActive) {
+    throw new Error(
+      "Your account is currently inactive."
+    )
+  }
+
+  return {
+    accessToken: `dummy-token-${student.userId}`,
+
+    user: {
+      id: student.userId,
+      email: student.email,
+      role: student.role,
+    },
+  }
 }
 
 export async function register(
