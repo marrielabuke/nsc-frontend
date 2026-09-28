@@ -25,32 +25,15 @@ export default function AddressStep({
 
   return (
     <div className="space-y-8">
-
-      {/* Information */}
-      <div className="rounded-2xl border bg-muted/30 p-5">
-        <div className="flex gap-4">
-          <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <Home className="size-5" />
-          </div>
-
-          <div>
-            <h3 className="font-semibold">
-              Residential Address
-            </h3>
-
-            <p className="mt-1 text-sm leading-6 text-muted-foreground">
-              Enter your current residential address.
-              Fields marked with an asterisk are required.
-            </p>
-          </div>
-        </div>
-      </div>
-
+      <h3 className="text-lg font-semibold">
+          Residential Address
+      </h3>
       {/* Address form */}
       <div className="grid gap-5 md:grid-cols-2">
-
+          
         {/* House Number */}
         <div className="space-y-2">
+         
           <Label htmlFor="houseNumber">
             House / Unit Number
           </Label>

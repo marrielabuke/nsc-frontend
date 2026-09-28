@@ -17,6 +17,7 @@ import type { RegistrationRecord } from "@/types/student/enrollment"
 
 import { useRouter } from "next/navigation"
 import { getStudentByUserId } from "@/lib/student/student-service"
+import { Spinner } from "@/components/ui/spinner"
 
 
 const CollegeStudentDashboard = () => {
@@ -62,17 +63,11 @@ const CollegeStudentDashboard = () => {
   setLoading(false)
 }, [router])
 
-  // ==========================================================
-  // LOADING
-  // ==========================================================
+
 
   if (loading) {
     return (
-      <div className="flex min-h-[calc(100vh-136px)] items-center justify-center">
-        <p className="text-sm text-muted-foreground">
-          Loading student information...
-        </p>
-      </div>
+      <Spinner></Spinner>
     )
   }
 

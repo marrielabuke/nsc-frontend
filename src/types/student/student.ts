@@ -9,9 +9,9 @@ export type StudentRegistrationStatus =
   | "verified"
   | "rejected"
 
-// ============================================================
+
 // GUARDIAN
-// ============================================================
+
 
 export interface StudentGuardian {
   relationship:
@@ -29,9 +29,9 @@ export interface StudentGuardian {
   occupation?: string
 }
 
-// ============================================================
+
 // PREVIOUS SCHOOL
-// ============================================================
+
 
 export interface StudentPreviousSchool {
   schoolName: string
@@ -44,23 +44,23 @@ export interface StudentPreviousSchool {
   yearGraduated: string
 }
 
-// ============================================================
+
 // DOCUMENTS
-// ============================================================
+
 
 export interface StudentDocuments {
   psaBirthCertificate?: string
   form138?: string
 }
 
-// ============================================================
+
 // STUDENT USER
-// ============================================================
+
 
 export interface StudentUser {
-  // =========================================================
+
   // USER ACCOUNT
-  // =========================================================
+
 
   userId: string
   email: string
@@ -71,9 +71,9 @@ export interface StudentUser {
 
   role: "student"
 
-  // =========================================================
+
   // PERSON
-  // =========================================================
+
 
   personId?: string
 
@@ -96,9 +96,9 @@ export interface StudentUser {
   citizenship?: string
   mobileNumber?: string
 
-  // =========================================================
+
   // ADDRESS
-  // =========================================================
+
 
   houseNumber?: string
   street?: string
@@ -107,43 +107,43 @@ export interface StudentUser {
   province?: string
   zipCode?: string
 
-  // =========================================================
+
   // GUARDIAN
-  // =========================================================
+
 
   guardian?: StudentGuardian
 
-  // =========================================================
+
   // PREVIOUS SCHOOL
-  // =========================================================
+
 
   previousSchool?: StudentPreviousSchool
 
-  // =========================================================
+
   // DOCUMENTS
-  // =========================================================
+
 
   documents?: StudentDocuments
 
-  // =========================================================
+
   // STUDENT STATUS HISTORY
-  // =========================================================
+
 
   studentStatusId?: string
   studentNumber?: string
   status?: StudentStatus
 
-  // =========================================================
+
   // STUDENT ENROLLMENT HISTORY
-  // =========================================================
+
 
   curriculumId?: string
   course?: string
   yearLevel?: number
 
-  // =========================================================
+
   // REGISTRATION
-  // =========================================================
+
 
   registrationStatus: StudentRegistrationStatus
 }

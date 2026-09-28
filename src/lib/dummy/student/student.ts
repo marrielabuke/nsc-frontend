@@ -186,11 +186,82 @@ export const dummyStudentUsers: StudentUser[] = [
 
     registrationStatus: "incomplete",
   },
+
+  // Pending Registration
+  {
+    // UserAccount
+    userId: "USR-008",
+    email: "pendingstudent@nsc.edu.ph",
+    password: "student123",
+    isEmailVerified: true,
+    isActive: true,
+    role: "student",
+
+    // Person
+    personId: "PER-008",
+    firstName: "Angela",
+    middleName: "Santos",
+    lastName: "Ramirez",
+
+    birthDate: "2007-05-15",
+    birthPlace: "Catarman, Northern Samar",
+    gender: "female",
+    civilStatus: "single",
+    citizenship: "Filipino",
+    mobileNumber: "09123456789",
+
+    // Address
+    houseNumber: "125",
+    street: "Rizal Street",
+    barangay: "Dalakit",
+    city: "Catarman",
+    province: "Northern Samar",
+    zipCode: "6400",
+
+    // Guardian
+    guardian: {
+      relationship: "mother",
+      firstName: "Elena",
+      middleName: "Cruz",
+      lastName: "Ramirez",
+      mobileNumber: "09987654321",
+      email: "elena.ramirez@example.com",
+      occupation: "Teacher",
+    },
+
+    // Previous School
+    previousSchool: {
+      schoolName: "Catarman National High School",
+      schoolType: "high-school",
+      schoolAddress: "Catarman, Northern Samar",
+      yearGraduated: "2026",
+    },
+
+    // Admission Documents
+    documents: {
+      psaBirthCertificate:
+        "angela-ramirez-psa.pdf",
+      form138:
+        "angela-ramirez-form138.pdf",
+    },
+
+    // No student number yet.
+    // These will be assigned after registrar verification.
+    //
+    // studentStatusId: undefined,
+    // studentNumber: undefined,
+    // curriculumId: undefined,
+    // course: undefined,
+    // yearLevel: undefined,
+
+    // Registration
+    registrationStatus: "pending_verification",
+  },
 ]
 
-// ============================================================
+
 // GET STUDENT BY USER ID
-// ============================================================
+
 
 export function getDummyStudentByUserId(
   userId: string
@@ -200,9 +271,9 @@ export function getDummyStudentByUserId(
   )
 }
 
-// ============================================================
+
 // CHECK IF PERSON INFORMATION EXISTS
-// ============================================================
+
 
 export function hasCompletedStudentInformation(
   student: StudentUser
@@ -214,9 +285,9 @@ export function hasCompletedStudentInformation(
   )
 }
 
-// ============================================================
+
 // REGISTRATION STATUS HELPERS
-// ============================================================
+
 
 export function isStudentRegistrationIncomplete(
   student: StudentUser
@@ -251,9 +322,9 @@ export function isStudentRegistrationRejected(
   )
 }
 
-// ============================================================
+
 // UPDATE REGISTRATION STATUS
-// ============================================================
+
 
 export function updateDummyStudentRegistrationStatus(
   userId: string,
@@ -272,9 +343,9 @@ export function updateDummyStudentRegistrationStatus(
   return student
 }
 
-// ============================================================
+
 // SUBMIT STUDENT INFORMATION
-// ============================================================
+
 // TEMPORARY FRONTEND-ONLY FUNCTION
 //
 // This simulates saving:
@@ -285,7 +356,7 @@ export function updateDummyStudentRegistrationStatus(
 // - Documents
 //
 // Later, replace this function with your backend API.
-// ============================================================
+
 
 export function submitDummyStudentInformation(
   userId: string,
@@ -298,9 +369,9 @@ export function submitDummyStudentInformation(
     return undefined
   }
 
-  // ----------------------------------------------------------
+
   // PERSON
-  // ----------------------------------------------------------
+
 
   student.personId =
     student.personId ??
@@ -318,9 +389,9 @@ export function submitDummyStudentInformation(
   student.citizenship = data.citizenship
   student.mobileNumber = data.mobileNumber
 
-  // ----------------------------------------------------------
+
   // ADDRESS
-  // ----------------------------------------------------------
+
 
   student.houseNumber = data.houseNumber
   student.street = data.street
@@ -329,9 +400,9 @@ export function submitDummyStudentInformation(
   student.province = data.province
   student.zipCode = data.zipCode
 
-  // ----------------------------------------------------------
+
   // GUARDIAN
-  // ----------------------------------------------------------
+
 
   student.guardian = {
     relationship: data.guardianRelationship,
@@ -346,9 +417,9 @@ export function submitDummyStudentInformation(
     occupation: data.guardianOccupation,
   }
 
-  // ----------------------------------------------------------
+
   // PREVIOUS SCHOOL
-  // ----------------------------------------------------------
+
 
   student.previousSchool = {
     schoolName: data.schoolName,
@@ -357,14 +428,14 @@ export function submitDummyStudentInformation(
     yearGraduated: data.yearGraduated,
   }
 
-  // ----------------------------------------------------------
+
   // DOCUMENTS
-  // ----------------------------------------------------------
+
   // For dummy data, only save the filename.
   //
   // Do NOT try to permanently store File objects here.
   // The backend will eventually upload the actual files.
-  // ----------------------------------------------------------
+
 
   student.documents = {
     psaBirthCertificate:
@@ -374,9 +445,9 @@ export function submitDummyStudentInformation(
       data.form138?.name,
   }
 
-  // ----------------------------------------------------------
+
   // REGISTRATION WORKFLOW
-  // ----------------------------------------------------------
+
 
   student.registrationStatus =
     "pending_verification"
@@ -384,11 +455,11 @@ export function submitDummyStudentInformation(
   return student
 }
 
-// ============================================================
+
 // DUMMY REGISTRAR APPROVAL
-// ============================================================
+
 // Useful later when testing the registrar side.
-// ============================================================
+
 
 export function approveDummyStudentRegistration(
   userId: string
@@ -405,9 +476,9 @@ export function approveDummyStudentRegistration(
   return student
 }
 
-// ============================================================
+
 // DUMMY REGISTRAR REJECTION
-// ============================================================
+
 
 export function rejectDummyStudentRegistration(
   userId: string

@@ -35,35 +35,9 @@ export default function PreviousSchoolStep({
 
   return (
     <div className="space-y-8">
-
-      {/* =====================================================
-          INTRODUCTION
-      ===================================================== */}
-
-      <div className="rounded-2xl border bg-muted/30 p-5">
-        <div className="flex gap-4">
-          <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <GraduationCap className="size-5" />
-          </div>
-
-          <div>
-            <h3 className="font-semibold">
-              Previous School Information
-            </h3>
-
-            <p className="mt-1 text-sm leading-6 text-muted-foreground">
-              Provide information about the school you
-              most recently attended before applying to
-              Northern Samar Colleges.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* =====================================================
-          SCHOOL
-      ===================================================== */}
-
+      <h3 className="text-lg font-semibold">
+          Previous School
+      </h3>
       <div className="grid gap-5 md:grid-cols-2">
 
         {/* School Name */}

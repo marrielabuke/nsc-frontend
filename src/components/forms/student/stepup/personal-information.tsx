@@ -33,21 +33,7 @@ export default function PersonalInformationStep({
 
   return (
     <div className="space-y-8">
-
-      {/* =====================================================
-          NAME
-      ===================================================== */}
-
       <div>
-        <h3 className="text-lg font-semibold">
-          Student Name
-        </h3>
-
-        <p className="mt-1 text-sm text-muted-foreground">
-          Enter your complete legal name as shown on your
-          official documents.
-        </p>
-
         <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
 
           {/* First Name */}

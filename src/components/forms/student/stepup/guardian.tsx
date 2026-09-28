@@ -46,34 +46,9 @@ export default function GuardianStep({
 
   return (
     <div className="space-y-8">
-      {/* =====================================================
-          INFORMATION
-      ===================================================== */}
-
-      <div className="rounded-2xl border bg-muted/30 p-5">
-        <div className="flex gap-4">
-          <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <Users className="size-5" />
-          </div>
-
-          <div>
-            <h3 className="font-semibold">
-              Parent / Guardian Information
-            </h3>
-
-            <p className="mt-1 text-sm leading-6 text-muted-foreground">
-              Provide the information of your parent or
-              legal guardian. Fields marked with an
-              asterisk are required.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* =====================================================
-          GUARDIAN FORM
-      ===================================================== */}
-
+      <h3 className="text-lg font-semibold">
+          Parent / Guardian 
+      </h3>
       <div className="grid gap-5 md:grid-cols-2">
         {/* Relationship */}
 

@@ -1,11 +1,17 @@
 "use client"
 
 import { useState } from "react"
+
 import {
   Check,
   ChevronLeft,
   ChevronRight,
+  FileCheck2,
+  GraduationCap,
+  Home,
   LoaderCircle,
+  UserRound,
+  Users,
 } from "lucide-react"
 
 import { useForm } from "react-hook-form"
@@ -29,6 +35,8 @@ import type {
   StudentUser,
 } from "@/types/student/student"
 
+
+
 interface StudentInformationFormProps {
   student: StudentUser
   onComplete?: (
@@ -36,30 +44,49 @@ interface StudentInformationFormProps {
   ) => void | Promise<void>
 }
 
+// remove this
 const steps = [
   {
     id: 1,
     title: "Personal Information",
+    description:
+      "Provide your basic personal information. Fields marked with an asterisk are required.",
+    icon: UserRound,
   },
   {
     id: 2,
-    title: "Address",
+    title: "Residential Address",
+    description:
+      "Enter your current residential address. Fields marked with an asterisk are required.",
+    icon: Home,
   },
   {
     id: 3,
-    title: "Guardian",
+    title: "Parent / Guardian Information",
+    description:
+      "Provide the information of your parent or legal guardian. Fields marked with an asterisk are required.",
+    icon: Users,
   },
   {
     id: 4,
     title: "Previous School",
+    description:
+      "Provide the details of the school you previously attended. Fields marked with an asterisk are required.",
+    icon: GraduationCap,
   },
   {
     id: 5,
-    title: "Documents",
+    title: "Admission Documents",
+    description:
+      "Upload the required admission documents. Make sure each document is clear and readable.",
+    icon: FileCheck2,
   },
   {
     id: 6,
-    title: "Review",
+    title: "Review Information",
+    description:
+      "Review all the information you provided before submitting your registration.",
+    icon: Check,
   },
 ]
 
@@ -72,6 +99,8 @@ export default function StudentInformationForm({
 
   const [isSubmitting, setIsSubmitting] =
     useState(false)
+
+
 
   const form = useForm<StudentInformationData>({
     resolver: zodResolver(
@@ -134,6 +163,16 @@ export default function StudentInformationForm({
       form138: undefined,
     },
   })
+
+  // ==========================================================
+  // CURRENT STEP INFORMATION
+  // ==========================================================
+
+  const activeStep =
+    steps[currentStep - 1]
+
+  const ActiveStepIcon =
+    activeStep.icon
 
   // ==========================================================
   // NEXT STEP
@@ -250,19 +289,7 @@ export default function StudentInformationForm({
         data
       )
 
-      /*
-       * ======================================================
-       * BACKEND API WILL GO HERE LATER
-       * ======================================================
-       *
-       * Example:
-       *
-       * await submitStudentInformation({
-       *   userId: student.userId,
-       *   ...data,
-       * })
-       *
-       */
+      // Backend API here
 
       await onComplete?.(data)
     } finally {
@@ -270,28 +297,36 @@ export default function StudentInformationForm({
     }
   }
 
+
   return (
-    <form
-      onSubmit={form.handleSubmit(
-        handleSubmit
-      )}
-      className="min-h-svh bg-background"
-    >
-      <div className="mx-auto max-w-6xl px-6 py-10 lg:px-12">
-        <div className="mb-8">
-          <p className="text-sm font-medium text-primary">
-            NSC Admission Portal
-          </p>
+    <div className="min-h-[calc(100vh-136px)] bg-muted/20 px-4 py-8 sm:px-6 lg:px-8">
+      <form
+        onSubmit={form.handleSubmit(
+          handleSubmit
+        )}
+        className="mx-auto max-w-6xl"
+      >
+        <div className="overflow-hidden rounded-2xl border bg-background shadow-sm">
+        
+          <div className="border-b px-6 py-6 sm:px-8">
+            <p className="text-sm font-medium text-primary">
+              NSC Admission Portal
+            </p>
 
-          <p className="mt-1 text-sm text-muted-foreground">
-            Account: {student.email}
-          </p>
-        </div>
+            <div className="mt-4 inline-flex rounded-lg border bg-muted/30 px-3 py-2">
+              <p className="text-sm text-muted-foreground">
+                Account:{" "}
+                <span className="font-medium text-foreground">
+                  {student.email}
+                </span>
+              </p>
+            </div>
+          </div>
 
-        <div className="mb-10">
-          <div className="flex items-start">
-            {steps.map(
-              (step, index) => {
+         <div className="border-b px-6 py-6 sm:px-8">
+          <div className="rounded-2xl border bg-muted/30 p-5 sm:p-6">
+            <div className="flex items-start">
+              {steps.map((step, index) => {
                 const isActive =
                   currentStep === step.id
 
@@ -303,17 +338,17 @@ export default function StudentInformationForm({
                     key={step.id}
                     className="flex flex-1 items-start"
                   >
-                    <div className="flex flex-col items-center">
+                    {/* STEP */}
 
-                      {/* Circle */}
+                    <div className="flex flex-col items-center">
                       <div
                         className={`
                           flex size-9 items-center
                           justify-center rounded-full
                           border text-sm font-medium
+                          transition-colors
                           ${
-                            isActive ||
-                            isCompleted
+                            isActive || isCompleted
                               ? "border-primary bg-primary text-primary-foreground"
                               : "border-border bg-background text-muted-foreground"
                           }
@@ -326,11 +361,11 @@ export default function StudentInformationForm({
                         )}
                       </div>
 
-                      {/* Title */}
                       <p
                         className={`
-                          mt-2 hidden text-center
-                          text-xs sm:block
+                          mt-2 hidden max-w-28
+                          text-center text-xs
+                          sm:block
                           ${
                             isActive
                               ? "font-medium text-primary"
@@ -342,15 +377,15 @@ export default function StudentInformationForm({
                       </p>
                     </div>
 
-                    {/* Connecting line */}
-                    {index <
-                      steps.length - 1 && (
+                    {/* CONNECTING LINE */}
+
+                    {index < steps.length - 1 && (
                       <div
                         className={`
                           mt-4 h-px flex-1
+                          transition-colors
                           ${
-                            currentStep >
-                            step.id
+                            currentStep > step.id
                               ? "bg-primary"
                               : "bg-border"
                           }
@@ -359,107 +394,98 @@ export default function StudentInformationForm({
                     )}
                   </div>
                 )
-              }
-            )}
+              })}
+            </div>
           </div>
         </div>
 
-  
-        <div className="mb-8 border-b pb-6">
-          <div className="flex items-center justify-between gap-4">
+          {/* Card */}
+          <div className="p-6 sm:p-4">
+         
 
-            <h2 className="text-2xl font-semibold tracking-tight">
-              {
-                steps[currentStep - 1]
-                  .title
-              }
-            </h2>           
-          </div>
-
-          <p className="mt-1 text-sm text-muted-foreground">
-            {currentStep === 6
-              ? "Review your information before submitting your registration."
-              : "Complete the information below before continuing to the next step."}
-          </p>
-        </div>
-
-        {currentStep === 1 && (
-          <PersonalInformationStep
-            form={form}
-          />
-        )}
-
-        {currentStep === 2 && (
-          <AddressStep form={form} />
-        )}
-
-        {currentStep === 3 && (
-          <GuardianStep form={form} />
-        )}
-
-        {currentStep === 4 && (
-          <PreviousSchoolStep
-            form={form}
-          />
-        )}
-
-        {currentStep === 5 && (
-          <DocumentsStep form={form} />
-        )}
-
-        {currentStep === 6 && (
-          <ReviewStep
-            data={form.getValues()}
-            email={student.email}
-          />
-        )}
-
-        {/* =====================================================
-            NAVIGATION
-        ===================================================== */}
-
-        <div className="mt-10 flex items-center justify-between border-t pt-6">
-
-          <Button
-            type="button"
-            variant="outline"
-            onClick={previousStep}
-            disabled={
-              currentStep === 1 ||
-              isSubmitting
-            }
-          >
-            <ChevronLeft className="size-4" />
-            Previous
-          </Button>
-
-          {currentStep <
-          steps.length ? (
-            <Button
-              type="button"
-              onClick={nextStep}
-            >
-              Continue
-
-              <ChevronRight className="size-4" />
-            </Button>
-          ) : (
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <>
-                  <LoaderCircle className="size-4 animate-spin" />
-                  Submitting...
-                </>
-              ) : (
-                "Submit Information"
+           
+            {/* Content */}
+            <div className="rounded-2xl border p-5 sm:p-4">
+              {currentStep === 1 && (
+                <PersonalInformationStep
+                  form={form}
+                />
               )}
-            </Button>
-          )}
+
+              {currentStep === 2 && (
+                <AddressStep form={form} />
+              )}
+
+              {currentStep === 3 && (
+                <GuardianStep form={form} />
+              )}
+
+              {currentStep === 4 && (
+                <PreviousSchoolStep
+                  form={form}
+                />
+              )}
+
+              {currentStep === 5 && (
+                <DocumentsStep form={form} />
+              )}
+
+              {currentStep === 6 && (
+                <ReviewStep
+                  data={form.getValues()}
+                  email={student.email}
+                />
+              )}
+            </div>
+
+            {/* Navigation */}
+
+            <div className="mt-4 flex items-center justify-between border-t pt-5">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={previousStep}
+                disabled={
+                  currentStep === 1 ||
+                  isSubmitting
+                }
+              >
+                <ChevronLeft className="size-4" />
+                Previous
+              </Button>
+
+              {currentStep <
+              steps.length ? (
+                <Button
+                  type="button"
+                  onClick={nextStep}
+                >
+                  Continue
+
+                  <ChevronRight className="size-4" />
+                </Button>
+              ) : (
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <LoaderCircle className="size-4 animate-spin" />
+                      Submitting...
+                    </>
+                  ) : (
+                    <>
+                      <Check className="size-4" />
+                      Submit Information
+                    </>
+                  )}
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
-    </form>
+      </form>
+    </div>
   )
 }
