@@ -278,33 +278,15 @@ export default function StudentInformationForm({
       className="min-h-svh bg-background"
     >
       <div className="mx-auto max-w-6xl px-6 py-10 lg:px-12">
-
-        {/* =====================================================
-            HEADER
-        ===================================================== */}
-
         <div className="mb-8">
           <p className="text-sm font-medium text-primary">
             NSC Admission Portal
-          </p>
-
-          <h1 className="mt-2 text-3xl font-bold tracking-tight">
-            Complete your profile
-          </h1>
-
-          <p className="mt-2 text-muted-foreground">
-            Please provide the required student
-            information to continue your admission.
           </p>
 
           <p className="mt-1 text-sm text-muted-foreground">
             Account: {student.email}
           </p>
         </div>
-
-        {/* =====================================================
-            STEP INDICATOR
-        ===================================================== */}
 
         <div className="mb-10">
           <div className="flex items-start">
@@ -380,27 +362,9 @@ export default function StudentInformationForm({
               }
             )}
           </div>
-
-          {/* Mobile */}
-          <div className="mt-5 sm:hidden">
-            <p className="text-sm font-medium text-primary">
-              Step {currentStep} of{" "}
-              {steps.length}
-            </p>
-
-            <p className="font-semibold">
-              {
-                steps[currentStep - 1]
-                  .title
-              }
-            </p>
-          </div>
         </div>
 
-        {/* =====================================================
-            CURRENT STEP HEADER
-        ===================================================== */}
-
+  
         <div className="mb-8 border-b pb-6">
           <div className="flex items-center justify-between gap-4">
 
@@ -409,12 +373,7 @@ export default function StudentInformationForm({
                 steps[currentStep - 1]
                   .title
               }
-            </h2>
-
-            <p className="hidden text-sm text-muted-foreground sm:block">
-              Step {currentStep} of{" "}
-              {steps.length}
-            </p>
+            </h2>           
           </div>
 
           <p className="mt-1 text-sm text-muted-foreground">
@@ -423,10 +382,6 @@ export default function StudentInformationForm({
               : "Complete the information below before continuing to the next step."}
           </p>
         </div>
-
-        {/* =====================================================
-            STEP CONTENT
-        ===================================================== */}
 
         {currentStep === 1 && (
           <PersonalInformationStep
